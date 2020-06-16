@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  web-php:
+    image: joseadiaz/web-php
+    deploy:
+        mode: replicated
+        replicas: 3
+        resources:
+          limits:
+            cpus: "0.2"
+            memory: 256M
+        restart_policy:
+            condition: on-failure
+            delay: 5s
+            max_attempts: 3
+    ports:
+      - "8080:80"
+    volumes:
+      - /html:/var/www/html
+    networks:
+      - clusnet
+
+
+  redis:
+    image: joseadiaz/redis
+    deploy:
+        mode: replicated
+        replicas: 2
+        resources:
+          limits:
+            cpus: "0.2"
+            memory: 256M
+        restart_policy:
+            condition: on-failure
+            delay: 5s
+            max_attempts: 3
+        placement:
+            constraints: [node.role == worker]
+    ports:
+     - "6379:6379"
+    volumes:
+      - /data:/data
+    networks:
+      - clusnet
+
+networks:
+   clusnet:
+
